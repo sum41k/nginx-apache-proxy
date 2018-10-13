@@ -1,0 +1,135 @@
+ - block:
+    #- name: Add repository
+    #  yum_repository:
+    #    name: epel
+    #    description: EPEL YUM repo
+    #    baseurl: https://download.fedoraproject.org/pub/epel/$releasever/$basearch/
+    #
+    - name: Check if EPEL repo is already configured.
+      stat: path={{ epel_repofile_path }}
+      register: epel_repofile_result
+
+    - name: Install EPEL repo.
+      yum:
+        name: "{{ epel_repo_url }}"
+        state: present
+      #register: result
+      #until: 'result.rc == 0'
+      #retries: 5
+      #delay: 10
+      #when: not epel_repofile_result.stat.exists
+
+    - name: Import EPEL GPG key.
+      rpm_key:
+        key: "{{ epel_repo_gpg_key_url }}"
+        state: present
+      #when: not epel_repofile_result.stat.exists
+      ignore_errors: "{{ ansible_check_mode }}"
+
+    #- name: upgrade all packages
+    #  yum:
+    #    name: '*'
+    #    state: latest
+        #disable_gpg_check: yes
+
+    - name: install nginx+apache
+      yum: name={{item}} state=installed
+      with_items:
+      - nginx
+      - httpd
+      - php
+      - php-devel
+
+    - name: create nginx configuration file
+      template: src=nginx.conf.j2 dest=/etc/nginx/nginx.conf
+      notify: restart nginx
+
+    - name: create apache configuration file
+      template: src=httpd.conf.j2 dest=/etc/httpd/conf/httpd.conf
+      notify: restart httpd
+      
+    # check if dir for vhosts exist
+    #- name: Check if the folder /root/.ssh exist
+    #  stat:
+    #    path: {{item}}
+    #    with_items: 
+    #    - {{apache_path}}
+    #    - {{nginx_path}}
+    #  register: stat_result
+
+    #- name: Create the folder, if it doesnt exist yet
+    #  file:
+    #    path: /root/.ssh
+    #    state: directory
+    #  when: stat_result.stat.exists == False
+
+    - name: Create directory for vhosts
+      file: dest={{item.path}}/{{item.owner}} state=directory
+      #with_nested: 
+      #- ["{{apache_path}}", "{{nginx_path}}", "{{domain_owner}}"]
+      loop:
+      - { path: "{{apache_path}}", owner: "{{domain_owner}}" }
+      - { path: "{{nginx_path}}", owner: "{{domain_owner}}" }
+#    - name: Create directory for vhost-config
+#      file: dest={{item}} state=directory
+#      with_items:
+#      - "{{apache_path}}"
+#      - "{{nginx_path}}"
+    #- name: Create home directory for domains
+    #  file: dest=/var/www/{{domain_owner}}/data/www/{{domain_name}} state=directory
+    #  with_items: 
+    #  - "{{domain_owner}}"
+    #  - "{{domain_name}}"
+    /*
+    - name: Create home directory for domains
+      file: dest=/var/www/{{domain_owner}}/data/www/{{domain_name}}  state=directory
+      with_items: 
+      #with_nested:
+      - "{{domain_owner}}"
+      - "{{domain_name}}"
+
+    - name: Copy index.html
+      template: src=index.html dest=/var/www/{{domain_owner}}/data/www/{{domain_name}}/index.html
+      with_nested:
+      - "{{domain_owner}}"
+      - "{{domain_name}}"
+      
+
+    - name: create apache domain file
+      template: src=apachedomain.conf.j2 dest={{apache_path}}/{{domain_owner}}/{{domain_name}}.conf
+      with_items:
+      - "{{apache_path}}"
+      - "{{domain_owner}}"
+      - "{{domain_name}}"
+
+    - name: create nginx domain file
+      template: src=nginxdomain.conf.j2 dst={{nginx_path}}/{{domain_owner}}/{{domain_name}}.conf
+      with_items:
+      - "{{nginx_path}}"
+      - "{{domain_owner}}"
+      - "{{domain_name}}"
+
+*/
+       # - name: replace line1
+   #   lineinfile:
+   #     dest: /etc/httpd/conf/httpd.conf
+   #     regexp: '^(.*)Listen (.*)$'
+   #     line: 'Listen 127.0.0.1:8080'
+   #     backrefs: yes
+
+   # - name: replace line2
+   #   lineinfile:
+   #     dest: /etc/httpd/conf/httpd.conf
+   #     regexp: '^(.*)DocumentRoot "/var/www/html/"(.*)$'
+   #     line: '"DocumentRoot "/usr/share/nginx/html/""'
+   #     backrefs: yes
+
+    - name: start nginx service
+      service: name=nginx state=started enabled=yes
+
+    - name: start httpd service
+      service: name=httpd state=started enabled=yes
+
+   when: ansible_os_family=="RedHat"
+   become: yes
+

@@ -1,0 +1,5 @@
+---
+# tasks file for nginx_proxy
+- name: Nginx+httpd proxy
+  import_tasks: CentOS-loops.yml
+

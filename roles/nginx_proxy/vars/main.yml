@@ -1,0 +1,7 @@
+---
+# vars file for nginx_proxy
+apache_path: /etc/httpd/conf/vhosts
+nginx_path: /etc/nginx/vhosts
+log_path: /var/www/httpd-logs
+#domain_owner: www-root
+#domain_name: [testdomain.com, bigdick.com]

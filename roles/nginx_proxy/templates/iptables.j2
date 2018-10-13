@@ -1,0 +1,17 @@
+*filter
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:STAFF - [0:0]
+-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A INPUT -i lo -j ACCEPT
+-A INPUT -f -j DROP
+-A INPUT -p icmp -j ACCEPT
+-A INPUT -p tcp -m state --state NEW -m multiport --dports 20:22,25,53,80,443,110,143,465,587,8083,10050,12000:12100 -j ACCEPT
+#-A INPUT -p tcp -m state --state NEW -m multiport --dports 25,53,80,443,110,143,465,587,10050,8083,12000:12100 -j ACCEPT
+#-A INPUT -p tcp -m state --state NEW -m multiport --dports 20:22,2222 -j STAFF
+-A INPUT -p udp -m state --state NEW -m multiport --dports 53 -j ACCEPT
+-A INPUT -j DROP
+-A STAFF -s 185.38.184.0/27 -j ACCEPT
+-A STAFF -s 193.178.146.65 -j ACCEPT
+COMMIT

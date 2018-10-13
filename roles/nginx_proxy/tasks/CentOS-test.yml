@@ -1,0 +1,19 @@
+---
+# - name: Create directory for vhosts
+ #  file: dest={{domain_path}}/{{domain_owner}} state=directory
+      #with_nested: 
+      #      #- ["{{apache_path}}", "{{nginx_path}}", "{{domain_owner}}"]
+   #loop:
+   #- { path: "{{apache_path}}", owner: "{{domain_owner}}" }
+   #- { path: "{{nginx_path}}", owner: "{{domain_owner}}" }
+- name: Create home directory for domains
+  file: dest=/var/www/{{item[0]}}/data/www/{{item[1]}}  state=directory
+  loop: "{{ query('nested',domain_owner,domain_name) }}"
+  #with_nested:
+  #- testdomain.com
+  #- bigdick.com
+
+  #- { name: "{{domain_name}}", owner: "{{domain_owner}}" }
+ # '{{lookup("domain")}}'
+  # - "{{domain_name}}"
+#  - domain_name

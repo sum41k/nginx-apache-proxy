@@ -1,0 +1,39 @@
+<VirtualHost 127.0.0.1:8080>
+        ServerName {{item[1]}}
+        ServerAlias www.{{item[1]}}
+        DocumentRoot /var/www/{{domain_owner}}/data/www/{{item[1]}}
+        ServerAdmin webmaster@{{item[1]}}
+        DirectoryIndex index.php index.html
+        AddDefaultCharset off
+        #AssignUserID {{domain_owner}} {{domain_owner}}
+        CustomLog /var/www/httpd-logs/{{item[1]}}.access.log combined
+        ErrorLog /var/www/httpd-logs/{{item[1]}}.error.log
+        <FilesMatch "\.ph(p[3-5]?|tml)$">
+                SetHandler application/x-httpd-php
+        </FilesMatch>
+        <FilesMatch "\.phps$">
+                SetHandler application/x-httpd-php-source
+        </FilesMatch>
+        <IfModule php5_module>
+                php_admin_value sendmail_path "/usr/sbin/sendmail -t -i -f webmaster@creditcentr.biz"
+                php_admin_value upload_tmp_dir "/var/www/{{domain_owner}}/data/mod-tmp"
+                php_admin_value session.save_path "/var/www/{{domain_owner}}/data/mod-tmp"
+                php_admin_value open_basedir "/var/www/{{domain_owner}}/data:."
+        </IfModule>
+        <IfModule php7_module>
+                php_admin_value sendmail_path "/usr/sbin/sendmail -t -i -f webmaster@creditcentr.biz"
+                php_admin_value upload_tmp_dir "/var/www/{{domain_owner}}/data/mod-tmp"
+                php_admin_value session.save_path "/var/www/{{domain_owner}}/data/mod-tmp"
+                php_admin_value open_basedir "/var/www/{{domain_owner}}/data:."
+        </IfModule>
+        SetEnvIf X-Forwarded-Proto https HTTPS=on
+</VirtualHost>
+<Directory /var/www/{{domain_owner}}/data/www/{{item[1]}}>
+        Options +Includes -ExecCGI
+        <IfModule php5_module>
+                php_admin_flag engine on
+        </IfModule>
+        <IfModule php7_module>
+                php_admin_flag engine on
+        </IfModule>
+</Directory>

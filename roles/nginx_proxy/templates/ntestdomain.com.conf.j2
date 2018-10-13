@@ -1,0 +1,34 @@
+server {
+        server_name bigdick.com www.bigdick.com;
+        charset off;
+        index index.php index.html;
+        disable_symlinks if_not_owner from=$root_path;
+        include /etc/nginx/vhosts-includes/*.conf;
+        include /etc/nginx/vhosts-resources/bigdick.com/*.conf;
+        access_log /var/www/httpd-logs/bigdick.com.access.log;
+        error_log /var/www/httpd-logs/bigdick.com.error.log notice;
+        ssi on;
+        set $root_path /var/www/sum41k/data/www/bigdick.com;
+        root $root_path;
+        listen 192.168.247.142:80;
+        location / {
+                location ~ [^/]\.ph(p\d*|tml)$ {
+                        try_files /does_not_exists @fallback;
+                }
+                location ~* ^.+\.(jpg|jpeg|gif|png|svg|js|css|mp3|ogg|mpe?g|avi|zip|gz|bz2?|rar|swf)$ {
+                        try_files $uri $uri/ @fallback;
+                }
+                location / {
+                        try_files /does_not_exists @fallback;
+                }
+        }
+        location @fallback {
+                proxy_pass http://127.0.0.1:8080;
+                proxy_redirect http://127.0.0.1:8080 /;
+                proxy_set_header Host $host;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                proxy_set_header X-Forwarded-Port $server_port;
+                access_log off;
+        }
+}

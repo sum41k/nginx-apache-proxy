@@ -1,0 +1,12 @@
+---
+- name: my test playbooks
+  hosts: testServer
+  remote_user: root
+  become: yes 
+  tasks:
+  - include_role:
+     name: nginx_proxy
+    vars:
+     domain_owner: 'www-root'
+     domain_name: ['testdomain.com','123.com','zzz.net','sum41k.testing.eu']
+

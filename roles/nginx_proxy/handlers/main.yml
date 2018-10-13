@@ -1,0 +1,10 @@
+---
+# handlers file for nginx_proxy
+- name: restart httpd
+  service: name=httpd state=restarted
+
+- name: restart nginx
+  service: name=nginx state=restarted
+
+- name: restart iptables
+  service: name=iptables state=restarted
